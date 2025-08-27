@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GraceConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --color-primary: 30 41 59; /* slate-800 */
+        --color-primary-light: 51 65 85; /* slate-700 */
+        --color-primary-lighter: 71 85 105; /* slate-600 */
+        --color-accent: 59 130 246; /* blue-600 */
+        --color-dark-blue: 67 56 202; /* indigo-600 */
+        --color-background: 248 250 252; /* slate-50 */
+        --color-card-bg: 255 255 255; /* white */
+        --color-text-base: 15 23 42; /* slate-900 */
+        --color-text-muted: 100 116 139; /* slate-500 */
+        --color-border: 226 232 240; /* slate-200 */
+        --color-table-header: 248 250 252; /* slate-50 */
+        --color-checkbox-border: 148 163 184; /* slate-400 */
+      }
+      /* Custom Selection Color */
+      ::selection {
+        background-color: rgb(var(--color-accent));
+        color: white;
+      }
+      [data-tooltip] {
+        position: relative;
+      }
+      [data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, calc(100% + 8px));
+        background-color: rgb(30 41 59);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+        pointer-events: none;
+      }
+      [data-tooltip]:hover::after {
+        opacity: 1;
+        visibility: visible;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background-color: rgb(var(--color-card-bg));
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(var(--color-text-muted), 0.3);
+        border-radius: 10px;
+        border: 2px solid rgb(var(--color-card-bg));
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(var(--color-text-muted), 0.5);
+      }
+      /* Global Form Styles */
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      input[type="date"],
+      input[type="time"],
+      input[type="number"],
+      input[type="tel"],
+      input[type="url"],
+      select,
+      textarea {
+        background-color: rgb(var(--color-card-bg));
+        color: black;
+        border: 1px solid rgb(var(--color-border));
+        border-radius: 0.375rem; /* rounded-md */
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem; /* text-sm */
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+      }
+      select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='rgb(var(--color-text-muted))' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: rgb(var(--color-accent));
+        box-shadow: 0 0 0 2px rgba(var(--color-accent), 0.3);
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: rgb(var(--color-text-muted));
+        opacity: 0.7;
+      }
+      label, legend {
+        color: rgb(var(--color-text-muted));
+        font-weight: 500;
+      }
+      input:disabled, select:disabled, textarea:disabled {
+        background-color: rgb(var(--color-border));
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      /* Custom Checkbox and Radio */
+      input[type="checkbox"], input[type="radio"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: transparent;
+        margin: 0;
+        font: inherit;
+        color: currentColor;
+        width: 1.15em;
+        height: 1.15em;
+        border: 1.5px solid rgb(var(--color-checkbox-border));
+        transform: translateY(-0.075em);
+        display: inline-grid;
+        place-content: center;
+        cursor: pointer;
+        transition: 120ms all ease-in-out;
+        position: relative; /* for focus ring */
+      }
+
+      input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px rgb(var(--color-card-bg)), 0 0 0 4px rgb(var(--color-accent));
+      }
+
+      input[type="checkbox"]:checked, input[type="radio"]:checked {
+        background-color: rgb(var(--color-accent));
+        border-color: rgb(var(--color-accent));
+      }
+
+      input[type="checkbox"]::before, input[type="radio"]::before {
+        content: "";
+        width: 0.65em;
+        height: 0.65em;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        box-shadow: inset 1em 1em white;
+      }
+
+      input[type="checkbox"]:checked::before {
+        transform: scale(1);
+        background-color: white;
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+      }
+      
+      input[type="radio"]::before {
+          border-radius: 50%;
+      }
+      
+      input[type="radio"]:checked::before {
+        transform: scale(1);
+      }
+
+      input[type="checkbox"] {
+          border-radius: 0.25em;
+      }
+      
+      input[type="radio"] {
+          border-radius: 50%;
+      }
+
+      /* Dropdown animation */
+      .dropdown-content {
+        animation: dropdown-fade-in 0.15s ease-out;
+        transform-origin: top right;
+      }
+
+      @keyframes dropdown-fade-in {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      
+      /* Custom Button Styles */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem; /* gap-2 */
+        padding: 0.5rem 1rem; /* px-4 py-2 */
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 600; /* font-semibold */
+        border-radius: 0.375rem; /* rounded-md */
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+        border: 1px solid transparent;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+      }
+      .btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn:hover:not(:disabled) {
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+        transform: translateY(-1px);
+      }
+      .btn:active:not(:disabled) {
+          transform: translateY(-1px) scale(0.98);
+      }
+
+      .btn-primary {
+        background-color: rgb(var(--color-dark-blue));
+        color: white;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background-color: rgb(49 46 129); /* indigo-800 */
+      }
+      .btn-primary:disabled {
+        background-color: rgb(156 163 175); /* gray-400 */
+      }
+
+      .btn-secondary {
+        background-color: rgb(var(--color-card-bg));
+        color: rgb(var(--color-text-base));
+        border-color: rgb(var(--color-border));
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background-color: rgb(248 250 252); /* slate-50 */
+      }
+
+      .btn-danger {
+        background-color: rgb(220 38 38); /* red-600 */
+        color: white;
+      }
+      .btn-danger:hover:not(:disabled) {
+        background-color: rgb(185 28 28); /* red-700 */
+      }
+
+      .btn-success {
+          background-color: rgb(22 163 74); /* green-600 */
+          color: white;
+      }
+      .btn-success:hover:not(:disabled) {
+          background-color: rgb(21 128 61); /* green-700 */
+      }
+      
+      .btn-warning {
+          background-color: rgb(249 115 22); /* orange-500 */
+          color: white;
+      }
+      .btn-warning:hover:not(:disabled) {
+          background-color: rgb(234 88 12); /* orange-600 */
+      }
+
+      .btn-icon {
+        padding: 0.5rem; /* p-2 */
+        border-radius: 9999px; /* rounded-full */
+        background-color: transparent;
+        color: rgb(var(--color-text-muted));
+        box-shadow: none;
+      }
+       .btn-icon:hover {
+        background-color: rgba(var(--color-text-muted), 0.1);
+        color: rgb(var(--color-text-base));
+      }
+
+      .btn-link {
+          background-color: transparent;
+          box-shadow: none;
+          padding: 0;
+          color: rgb(var(--color-accent));
+      }
+      .btn-link:hover {
+          text-decoration: underline;
+          transform: none;
+          box-shadow: none;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: false,
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+            colors: {
+              'church-dark-teal': 'rgb(var(--color-primary) / <alpha-value>)',
+              'church-teal': 'rgb(var(--color-primary-light) / <alpha-value>)',
+              'church-light-teal': 'rgb(var(--color-primary-lighter) / <alpha-value>)',
+              'church-green': 'rgb(var(--color-accent) / <alpha-value>)',
+              'church-dark-blue': 'rgb(var(--color-dark-blue) / <alpha-value>)',
+              'church-bg': 'rgb(var(--color-background) / <alpha-value>)',
+              'theme-bg': 'rgb(var(--color-background))',
+              'theme-card': 'rgb(var(--color-card-bg))',
+              'theme-text-base': 'rgb(var(--color-text-base))',
+              'theme-text-muted': 'rgb(var(--color-text-muted))',
+              'theme-border': 'rgb(var(--color-border))',
+              'theme-accent': 'rgb(var(--color-accent))',
+              'theme-table-header': 'rgb(var(--color-table-header))',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .print-title {
+        display: none;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #receipt-printable-area, #receipt-printable-area *,
+        #personnel-printable-area, #personnel-printable-area * {
+          visibility: visible;
+        }
+        #receipt-printable-area,
+        #personnel-printable-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 1rem;
+        }
+        .no-print {
+           display: none !important;
+        }
+
+        .print-title {
+          display: block !important;
+          color: black !important;
+          margin-bottom: 1rem;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        @page {
+          size: A4 landscape;
+          margin: 1cm;
+        }
+
+        #personnel-printable-area table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            font-size: 9pt !important;
+        }
+
+        #personnel-printable-area th, 
+        #personnel-printable-area td {
+            border: 1px solid #ccc !important;
+            padding: 6px !important;
+            text-align: left !important;
+        }
+        
+        #personnel-printable-area thead {
+          display: table-header-group;
+          background-color: #f2f2f2 !important;
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        
+        #personnel-printable-area thead tr th {
+          color: black !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "recharts": "https://esm.sh/recharts@^3.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "jspdf-autotable": "https://esm.sh/jspdf-autotable@3.8.2",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="font-sans">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
